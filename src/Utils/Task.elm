@@ -90,24 +90,60 @@ toError result =
 errorToString : Error -> String
 errorToString error =
     case error of
-        PGError (PG.BadStatus 403 _ _) ->
-            "You are not authorized to perform this action"
+        PGError PG.Timeout ->
+            "Timeout"
 
-        PGError (PG.BadStatus _ _ { message }) ->
-            message
-                |> Maybe.map (\msg -> "The server responded with error: " ++ msg)
-                |> Maybe.withDefault genericError
+        PGError (PG.BadUrl msg) ->
+            "Bad url:" ++ msg
 
-        HttpError _ ->
-            "Something went wrong with the connection, please try again later"
+        PGError PG.NetworkError ->
+            "Postgres network error"
+
+        PGError (PG.BadBody msg) ->
+            "Postgres bad body:" ++ msg
+
+        PGError (PG.BadStatus statusCode msg { message }) ->
+            "Bad status "
+                ++ (statusCode |> String.fromInt)
+                ++ ": "
+                ++ msg
+                ++ "."
+                ++ (message
+                        |> Maybe.map (\text -> " " ++ text)
+                        |> Maybe.withDefault ""
+                   )
+
+        HttpError httpError ->
+            case httpError of
+                Http.BadUrl str ->
+                    str
+
+                Http.Timeout ->
+                    "Request Timeout"
+
+                Http.NetworkError ->
+                    "Network Error"
+
+                Http.BadStatus status ->
+                    "Bad status: " ++ (status |> String.fromInt)
+
+                Http.BadBody msg ->
+                    msg
 
         DecodeError err ->
             Decode.errorToString err
 
-        _ ->
-            genericError
+        BadSchema msg ->
+            msg
 
+        RequestError msg ->
+            msg
 
-genericError : String
-genericError =
-    "Something went wrong, we'll fix soon"
+        NoError ->
+            "No Error"
+
+        AuthError ->
+            "Auth Error"
+
+        AutocompleteError msg ->
+            msg
