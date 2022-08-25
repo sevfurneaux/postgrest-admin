@@ -115,8 +115,8 @@ errorToString error =
 
         HttpError httpError ->
             case httpError of
-                Http.BadUrl str ->
-                    str
+                Http.BadUrl msg ->
+                    msg
 
                 Http.Timeout ->
                     "Request Timeout"
