@@ -97,7 +97,7 @@ errorToString error =
             "Bad url:" ++ msg
 
         PGError PG.NetworkError ->
-            "Postgres network error"
+            "Network error"
 
         PGError (PG.BadBody msg) ->
             "Postgres bad body:" ++ msg
