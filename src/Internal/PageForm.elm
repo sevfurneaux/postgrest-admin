@@ -122,8 +122,10 @@ update msg (PageForm params) =
             , AppCmd.none
             )
 
-        Fetched (Err _) ->
-            ( PageForm params, AppCmd.none )
+        Fetched (Err err) ->
+            ( PageForm params
+            , Notification.error (Utils.Task.errorToString err)
+            )
 
         Saved (Ok record) ->
             ( PageForm params
