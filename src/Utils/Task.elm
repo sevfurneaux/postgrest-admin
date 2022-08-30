@@ -8,14 +8,18 @@ module Utils.Task exposing
     , toError
     )
 
+import Browser.Dom
 import Http
 import Json.Decode as Decode exposing (Decoder)
+import Parser
 import Postgrest.Client as PG
 import Task exposing (Task)
 
 
 type Error
-    = HttpError Http.Error
+    = DomError Browser.Dom.Error
+    | ParserError (List Parser.DeadEnd)
+    | HttpError Http.Error
     | DecodeError Decode.Error
     | PGError PG.Error
     | BadSchema String
@@ -90,6 +94,12 @@ toError result =
 errorToString : Error -> String
 errorToString error =
     case error of
+        DomError (Browser.Dom.NotFound err) ->
+            err
+
+        ParserError err ->
+            Parser.deadEndsToString err
+
         PGError PG.Timeout ->
             "Timeout"
 
