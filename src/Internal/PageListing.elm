@@ -394,11 +394,15 @@ update msg listing =
                 ]
             )
 
-        CsvUploadPosted (Err _) ->
-            ( listing, AppCmd.none )
+        CsvUploadPosted (Err err) ->
+            ( listing
+            , Notification.error (Utils.Task.errorToString err)
+            )
 
-        FetchFailed _ ->
-            ( listing, AppCmd.none )
+        FetchFailed err ->
+            ( listing
+            , Notification.error (Utils.Task.errorToString err)
+            )
 
 
 listingPath : PageListing -> String
