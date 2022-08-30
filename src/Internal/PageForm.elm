@@ -135,8 +135,10 @@ update msg (PageForm params) =
                 ]
             )
 
-        Saved (Err _) ->
-            ( PageForm params, AppCmd.none )
+        Saved (Err err) ->
+            ( PageForm params
+            , Notification.error (Utils.Task.errorToString err)
+            )
 
         InputChanged inputMsg ->
             let
